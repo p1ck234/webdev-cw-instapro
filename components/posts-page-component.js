@@ -2,6 +2,8 @@ import { USER_POSTS_PAGE } from "../routes.js";
 import { renderHeaderComponent } from "./header-component.js";
 import { posts, goToPage } from "../index.js";
 import { sanitizeHtml } from "../helpers.js";
+import { formatDistanceToNow } from "date-fns";
+import { ru } from "date-fns/locale";
 
 export function renderPostsPageComponent({ appEl }) {
   // TODO: реализовать рендер постов из api
@@ -30,7 +32,6 @@ export function renderPostsPageComponent({ appEl }) {
             </button>
             <p class="post-likes-text">
               Нравится: <strong>${comment.likes.map((name) => {
-                console.log(name);
                 return sanitizeHtml(name.name);
               })}</strong>
             </p>
@@ -40,7 +41,9 @@ export function renderPostsPageComponent({ appEl }) {
            ${comment.description}
           </p>
           <p class="post-date">
-            19 минут назад
+            ${formatDistanceToNow(comment.createdAt, new Date(), {
+              locale: ru,
+            })}
           </p>
         </li>
           </div>`;
