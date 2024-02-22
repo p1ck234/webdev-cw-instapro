@@ -11,15 +11,14 @@ export function renderPostsPageComponent({ appEl }) {
    * можно использовать https://date-fns.org/v2.29.3/docs/formatDistanceToNow
    */
   const appHtml = posts.map((comment) => {
-    const commentUser = comment.likes.map((name) =>{
-      console.log(name.name);
-    })
     return `<div class="page-container">
       <div class="header-container"></div>
       <ul class="posts">
         <li class="post">
           <div class="post-header" data-user-id="${comment.id}">
-              <img src="${comment.user.imageUrl}" class="post-header__user-image">
+              <img src="${
+                comment.user.imageUrl
+              }" class="post-header__user-image">
               <p class="post-header__user-name">${comment.user.name}</p>
           </div>
           <div class="post-image-container">
@@ -30,7 +29,10 @@ export function renderPostsPageComponent({ appEl }) {
               <img src="./assets/images/like-active.svg">
             </button>
             <p class="post-likes-text">
-              Нравится: <strong>${comment.likes}</strong>
+              Нравится: <strong>${comment.likes.map((name) => {
+                console.log(name);
+                return sanitizeHtml(name.name);
+              })}</strong>
             </p>
           </div>
           <p class="post-text">
@@ -41,11 +43,7 @@ export function renderPostsPageComponent({ appEl }) {
             19 минут назад
           </p>
         </li>
-        <li class="post">
-          <div class="post-header" data-user-id="6425602ce156b600f7858df2">
-              <img src="https://storage.yandexcloud.net/skypro-webdev-homework-bucket/1680601502867-%25C3%2590%25C2%25A1%25C3%2590%25C2%25BD%25C3%2590%25C2%25B8%25C3%2590%25C2%25BC%25C3%2590%25C2%25BE%25C3%2590%25C2%25BA%2520%25C3%2591%25C2%258D%25C3%2590%25C2%25BA%25C3%2591%25C2%2580%25C3%2590%25C2%25B0%25C3%2590%25C2%25BD%25C3%2590%25C2%25B0%25202023-04-04%2520%25C3%2590%25C2%25B2%252014.04.29.png" class="post-header__user-image">
-              <p class="post-header__user-name">Варварва Н.</p>
-          </div></div>`;
+          </div>`;
   });
 
   appEl.innerHTML = appHtml;
