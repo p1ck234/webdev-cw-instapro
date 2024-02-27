@@ -90,16 +90,4 @@ export function renderPostsPageComponent({ appEl, token }) {
       }
     });
   }
-
-  //   for (let commentEl of document.querySelectorAll(".like-button")) {
-  //     commentEl.addEventListener("click", () => {
-  //       const likeEl = commentEl.parentNode.querySelector("#img-like");
-  //       let commentID = commentEl.dataset.postid;
-  //       if (likeEl.src === "../assets/images/like-active.svg") {
-  //         disLikePost(token, commentID);
-  //       } else {
-  //         likePost(token, commentID);
-  //       }
-  //     });
-  //   }
 }
