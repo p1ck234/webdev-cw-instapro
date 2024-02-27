@@ -19,6 +19,7 @@ export function getPosts({ token }) {
       return response.json();
     })
     .then((data) => {
+      console.log(data.posts);
       return data.posts;
     });
 }
@@ -66,5 +67,18 @@ export function uploadImage({ file }) {
     body: data,
   }).then((response) => {
     return response.json();
+  });
+}
+
+export function addPost({ token, description, imageUrl }) {
+  return fetch(postsHost, {
+    method: "POST",
+    body: JSON.stringify({
+      description,
+      imageUrl,
+    }),
+    headers: {
+      Authorization: token,
+    },
   });
 }
