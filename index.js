@@ -4,6 +4,8 @@ import { renderAuthPageComponent } from "./components/auth-page-component.js";
 import { ru } from "date-fns/locale";
 import { sanitizeHtml } from "./helpers.js";
 import { formatDistanceToNow } from "date-fns";
+import { likePost, disLikePost } from "./api.js";
+import { renderHeaderComponent } from "./components/header-component.js";
 import {
   ADD_POSTS_PAGE,
   AUTH_PAGE,
@@ -133,14 +135,7 @@ const renderApp = () => {
     // TODO: реализовать страницу фотографию пользвателя
 
     const appHtml = posts.map((comment) => {
-      return `<div class="posts-user-header">
-       <img src="${
-         comment.user.imageUrl
-       }" class="posts-user-header__user-image">
-       <p class="posts-user-header__user-name">${comment.user.name}</p>
-   </div>
-  <div class="page-container">
-    <div class="header-container"></div>
+      return `
     <ul class="posts">
       <li class="post">
         <div class="post-header" data-user-id="${comment.id}">
@@ -170,9 +165,35 @@ const renderApp = () => {
           })}
         </p>
       </li>
-        </div>`;
+        `;
     });
-    appEl.innerHTML = appHtml;
+    appEl.innerHTML =
+      `<div class="page-container">
+      <div class="header-container"></div><div class="posts-user-header">
+    <img src="${posts[0].user.imageUrl}" class="posts-user-header__user-image">
+    <p class="posts-user-header__user-name">${posts[0].user.name}</p>
+</div>
+` + appHtml;
+    renderHeaderComponent({
+      element: document.querySelector(".header-container"),
+    });
+    for (let likeButton of document.querySelectorAll(".like-button")) {
+      likeButton.addEventListener("click", async () => {
+        let token = getToken();
+        const likeImage = likeButton.querySelector("img");
+        let commentID = likeButton.dataset.postid;
+
+        if (likeImage.src.includes("like-active")) {
+          // Dislike post
+          await disLikePost(token, commentID);
+          likeImage.src = "./assets/images/like-not-active.svg";
+        } else {
+          // Like post
+          await likePost(token, commentID);
+          likeImage.src = "./assets/images/like-active.svg";
+        }
+      });
+    }
     return;
   }
 };
