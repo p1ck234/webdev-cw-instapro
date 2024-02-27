@@ -4,8 +4,9 @@ import { posts, goToPage } from "../index.js";
 import { sanitizeHtml } from "../helpers.js";
 import { formatDistanceToNow } from "date-fns";
 import { ru } from "date-fns/locale";
+import { likePost } from "../api.js";
 
-export function renderPostsPageComponent({ appEl }) {
+export function renderPostsPageComponent({ appEl, token }) {
   // TODO: реализовать рендер постов из api
   console.log("Актуальный список постов:", posts);
   /**
@@ -61,6 +62,14 @@ export function renderPostsPageComponent({ appEl }) {
       goToPage(USER_POSTS_PAGE, {
         userId: userEl.dataset.userId,
       });
+    });
+  }
+  for (let commentEl of document.querySelectorAll(".post-likes")) {
+    commentEl.addEventListener("click", () => {
+      let commentID = commentEl.dataset.postId;
+
+      likePost({ token, commentID });
+      console.log(token);
     });
   }
 }

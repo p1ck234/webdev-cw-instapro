@@ -99,3 +99,22 @@ export function getPostsUser({ id }) {
       return data.posts;
     });
 }
+
+export function likePost({ token, id }) {
+  return fetch(postsHost + "/" + id + "/like/", {
+    method: "POST",
+    headers: {
+      Authorization: token,
+    },
+  })
+    .then((response) => {
+      if (response.status === 401) {
+        throw new Error("Нет авторизации");
+      }
+
+      return response.json();
+    })
+    .then((data) => {
+      
+    });
+}

@@ -1,8 +1,9 @@
 import { getPosts, addPost, getPostsUser } from "./api.js";
 import { renderAddPostPageComponent } from "./components/add-post-page-component.js";
 import { renderAuthPageComponent } from "./components/auth-page-component.js";
-import { formatDistanceToNow } from "date-fns";
 import { ru } from "date-fns/locale";
+import { sanitizeHtml } from "./helpers.js";
+import { formatDistanceToNow } from "date-fns";
 import {
   ADD_POSTS_PAGE,
   AUTH_PAGE,
@@ -70,30 +71,17 @@ export const goToPage = async (newPage, data) => {
 
     if (newPage === USER_POSTS_PAGE) {
       // TODO: реализовать получение постов юзера из API
-      const userId = data.userId;
-      console.log("Открываю страницу пользователя: ", userId);
-
-      try {
-        posts = await getPostsUser({ id: userId });
-        page = USER_POSTS_PAGE;
-        renderApp();
-      } catch (error) {
-        console.error(error);
-        // Handle error appropriately
-      }
-      return;
+      let id = data.userId;
+      console.log("Открываю страницу пользователя: ", data.userId);
+      posts = await getPostsUser({ id });
+      page = USER_POSTS_PAGE;
+      return renderApp();
     }
-    //   let id = data.userId;
-    //   console.log("Открываю страницу пользователя: ", data.userId);
-    //   posts = getPostsUser({ id });
-    //   page = USER_POSTS_PAGE;
-    //   return renderApp();
-    // }
 
-    // page = newPage;
-    // renderApp();
+    page = newPage;
+    renderApp();
 
-    // return;
+    return;
   }
 
   throw new Error("страницы не существует");
@@ -144,7 +132,12 @@ const renderApp = () => {
     // TODO: реализовать страницу фотографию пользвателя
 
     const appHtml = posts.map((comment) => {
-      return `
+      return `<div class="posts-user-header">
+       <img src="${
+         comment.user.imageUrl
+       }" class="posts-user-header__user-image">
+       <p class="posts-user-header__user-name">${comment.user.name}</p>
+   </div>
   <div class="page-container">
     <div class="header-container"></div>
     <ul class="posts">
@@ -178,11 +171,7 @@ const renderApp = () => {
       </li>
         </div>`;
     });
-    appEl.innerHTML =
-      `<div class="posts-user-header">
-    <img src="${posts[0].user.imageUrl}" class="posts-user-header__user-image">
-    <p class="posts-user-header__user-name">${posts[0].user.name}</p>
-</div>` + appHtml;
+    appEl.innerHTML = appHtml;
     return;
   }
 };
