@@ -100,8 +100,8 @@ export function getPostsUser({ id }) {
     });
 }
 
-export function likePost({ token, id }) {
-  return fetch(postsHost + "/" + id + "/like/", {
+export function likePost(token, id) {
+  return fetch(postsHost + `/${id}/like`, {
     method: "POST",
     headers: {
       Authorization: token,
@@ -114,7 +114,21 @@ export function likePost({ token, id }) {
 
       return response.json();
     })
-    .then((data) => {
-      
-    });
+    .then((data) => {});
+}
+export function disLikePost(token, id) {
+  return fetch(postsHost + `/${id}/dislike`, {
+    method: "POST",
+    headers: {
+      Authorization: token,
+    },
+  })
+    .then((response) => {
+      if (response.status === 401) {
+        throw new Error("Нет авторизации");
+      }
+
+      return response.json();
+    })
+    .then((data) => {});
 }

@@ -1,3 +1,13 @@
+/* Add these styles to your CSS file */
+.active-like {
+  src: url("./assets/images/like-active.svg");
+}
+
+/* Default style for not active like */
+#img-like {
+  src: url("./assets/images/like-not-active.svg");
+}
+
 .page-container {
   padding: 0 20px;
 }

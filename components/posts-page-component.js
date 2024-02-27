@@ -4,7 +4,7 @@ import { posts, goToPage } from "../index.js";
 import { sanitizeHtml } from "../helpers.js";
 import { formatDistanceToNow } from "date-fns";
 import { ru } from "date-fns/locale";
-import { likePost } from "../api.js";
+import { likePost, disLikePost } from "../api.js";
 
 export function renderPostsPageComponent({ appEl, token }) {
   // TODO: реализовать рендер постов из api
@@ -29,18 +29,27 @@ export function renderPostsPageComponent({ appEl, token }) {
             <img class="post-image" src="${comment.imageUrl}">
           </div>
           <div class="post-likes">
-            <button data-post-id="${comment.id}" class="like-button">
-              <img src="./assets/images/like-active.svg">
+            <button data-postid="${comment.id}" class="like-button">
+            <img id="img-like" src="${
+              comment.isLiked
+                ? "../assets/images/like-active.svg"
+                : "../assets/images/like-not-active.svg"
+            }">
+
             </button>
             <p class="post-likes-text">
-              Нравится: <strong>${comment.likes.map((name) => {
-                return sanitizeHtml(name.name);
-              })}</strong>
+              Нравится: <strong>${
+                comment.likes && comment.likes.length > 0
+                  ? comment.likes
+                      .map((name) => sanitizeHtml(name.name))
+                      .join(", ")
+                  : 0
+              }</strong>
             </p>
           </div>
           <p class="post-text">
             <span class="user-name">${comment.user.name}</span>
-           ${comment.description}
+           ${sanitizeHtml(comment.description)}
           </p>
           <p class="post-date">
             ${formatDistanceToNow(comment.createdAt, new Date(), {
@@ -64,12 +73,33 @@ export function renderPostsPageComponent({ appEl, token }) {
       });
     });
   }
-  for (let commentEl of document.querySelectorAll(".post-likes")) {
-    commentEl.addEventListener("click", () => {
-      let commentID = commentEl.dataset.postId;
 
-      likePost({ token, commentID });
-      console.log(token);
+  for (let likeButton of document.querySelectorAll(".like-button")) {
+    likeButton.addEventListener("click", async () => {
+      const likeImage = likeButton.querySelector("img");
+      let commentID = likeButton.dataset.postid;
+
+      if (likeImage.src.includes("like-active")) {
+        // Dislike post
+        await disLikePost(token, commentID);
+        likeImage.src = "../assets/images/like-not-active.svg";
+      } else {
+        // Like post
+        await likePost(token, commentID);
+        likeImage.src = "../assets/images/like-active.svg";
+      }
     });
   }
+
+  //   for (let commentEl of document.querySelectorAll(".like-button")) {
+  //     commentEl.addEventListener("click", () => {
+  //       const likeEl = commentEl.parentNode.querySelector("#img-like");
+  //       let commentID = commentEl.dataset.postid;
+  //       if (likeEl.src === "../assets/images/like-active.svg") {
+  //         disLikePost(token, commentID);
+  //       } else {
+  //         likePost(token, commentID);
+  //       }
+  //     });
+  //   }
 }
