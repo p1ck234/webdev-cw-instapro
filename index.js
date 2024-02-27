@@ -1,6 +1,8 @@
-import { getPosts, addPost } from "./api.js";
+import { getPosts, addPost, getPostsUser } from "./api.js";
 import { renderAddPostPageComponent } from "./components/add-post-page-component.js";
 import { renderAuthPageComponent } from "./components/auth-page-component.js";
+import { formatDistanceToNow } from "date-fns";
+import { ru } from "date-fns/locale";
 import {
   ADD_POSTS_PAGE,
   AUTH_PAGE,
@@ -34,7 +36,7 @@ export const logout = () => {
 /**
  * Включает страницу приложения
  */
-export const goToPage = (newPage, data) => {
+export const goToPage = async (newPage, data) => {
   if (
     [
       POSTS_PAGE,
@@ -68,16 +70,30 @@ export const goToPage = (newPage, data) => {
 
     if (newPage === USER_POSTS_PAGE) {
       // TODO: реализовать получение постов юзера из API
-      console.log("Открываю страницу пользователя: ", data.userId);
-      page = USER_POSTS_PAGE;
-      posts = [];
-      return renderApp();
+      const userId = data.userId;
+      console.log("Открываю страницу пользователя: ", userId);
+
+      try {
+        posts = await getPostsUser({ id: userId });
+        page = USER_POSTS_PAGE;
+        renderApp();
+      } catch (error) {
+        console.error(error);
+        // Handle error appropriately
+      }
+      return;
     }
+    //   let id = data.userId;
+    //   console.log("Открываю страницу пользователя: ", data.userId);
+    //   posts = getPostsUser({ id });
+    //   page = USER_POSTS_PAGE;
+    //   return renderApp();
+    // }
 
-    page = newPage;
-    renderApp();
+    // page = newPage;
+    // renderApp();
 
-    return;
+    // return;
   }
 
   throw new Error("страницы не существует");
@@ -126,7 +142,47 @@ const renderApp = () => {
 
   if (page === USER_POSTS_PAGE) {
     // TODO: реализовать страницу фотографию пользвателя
-    appEl.innerHTML = "Здесь будет страница фотографий пользователя";
+
+    const appHtml = posts.map((comment) => {
+      return `
+  <div class="page-container">
+    <div class="header-container"></div>
+    <ul class="posts">
+      <li class="post">
+        <div class="post-header" data-user-id="${comment.id}">
+            <img src="${comment.user.imageUrl}" class="post-header__user-image">
+            <p class="post-header__user-name">${comment.user.name}</p>
+        </div>
+        <div class="post-image-container">
+          <img class="post-image" src="${comment.imageUrl}">
+        </div>
+        <div class="post-likes">
+          <button data-post-id="${comment.id}" class="like-button">
+            <img src="./assets/images/like-active.svg">
+          </button>
+          <p class="post-likes-text">
+            Нравится: <strong>${comment.likes.map((name) => {
+              return sanitizeHtml(name.name);
+            })}</strong>
+          </p>
+        </div>
+        <p class="post-text">
+          <span class="user-name">${comment.user.name}</span>
+         ${comment.description}
+        </p>
+        <p class="post-date">
+          ${formatDistanceToNow(comment.createdAt, new Date(), {
+            locale: ru,
+          })}
+        </p>
+      </li>
+        </div>`;
+    });
+    appEl.innerHTML =
+      `<div class="posts-user-header">
+    <img src="${posts[0].user.imageUrl}" class="posts-user-header__user-image">
+    <p class="posts-user-header__user-name">${posts[0].user.name}</p>
+</div>` + appHtml;
     return;
   }
 };
