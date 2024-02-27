@@ -34,12 +34,18 @@ export function registerUser({ login, password, name, imageUrl }) {
       name,
       imageUrl,
     }),
-  }).then((response) => {
-    if (response.status === 400) {
-      throw new Error("Такой пользователь уже существует");
-    }
-    return response.json();
-  });
+  })
+    .then((response) => {
+      if (response.status === 400) {
+        throw new Error("Такой пользователь уже существует");
+      }
+      return response.json();
+    })
+    .catch((error) => {
+      if (error.message === "Такой пользователь уже существует") {
+        alert("Такой пользователь уже существует");
+      } else alert("Кажется, у вас сломался интернет, попробуйте позже");
+    });
 }
 
 export function loginUser({ login, password }) {
@@ -49,12 +55,18 @@ export function loginUser({ login, password }) {
       login,
       password,
     }),
-  }).then((response) => {
-    if (response.status === 400) {
-      throw new Error("Неверный логин или пароль");
-    }
-    return response.json();
-  });
+  })
+    .then((response) => {
+      if (response.status === 400) {
+        throw new Error("Неверный логин или пароль");
+      }
+      return response.json();
+    })
+    .catch((error) => {
+      if (error.message === "Неверный логин или пароль") {
+        alert("Неверный логин или пароль");
+      } else alert("Кажется, у вас сломался интернет, попробуйте позже");
+    });
 }
 
 // Загружает картинку в облако, возвращает url загруженной картинки
@@ -91,12 +103,16 @@ export function getPostsUser({ id }) {
       if (response.status === 401) {
         throw new Error("Нет авторизации");
       }
-
       return response.json();
     })
     .then((data) => {
       console.log(data.posts);
       return data.posts;
+    })
+    .catch((error) => {
+      if (error.message === "Нет авторизации") {
+        alert("Нет авторизации");
+      } else alert("Кажется, у вас сломался интернет, попробуйте позже");
     });
 }
 
@@ -114,7 +130,11 @@ export function likePost(token, id) {
 
       return response.json();
     })
-    .then((data) => {});
+    .catch((error) => {
+      if (error.message === "Нет авторизации") {
+        alert("Нет авторизации");
+      } else alert("Кажется, у вас сломался интернет, попробуйте позже");
+    });
 }
 export function disLikePost(token, id) {
   return fetch(postsHost + `/${id}/dislike`, {
@@ -130,5 +150,9 @@ export function disLikePost(token, id) {
 
       return response.json();
     })
-    .then((data) => {});
+    .catch((error) => {
+      if (error.message === "Нет авторизации") {
+        alert("Нет авторизации");
+      } else alert("Кажется, у вас сломался интернет, попробуйте позже");
+    });
 }
